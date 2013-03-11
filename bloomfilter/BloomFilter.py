@@ -31,6 +31,7 @@ class BloomFilter():
 
        取 m/n = 20, k=14, FNR已经足够小
        http://pages.cs.wisc.edu/~cao/papers/summary-cache/node8.html#SECTION00053000000000000000
+       (上文中n为bloomfilter中插入的字符串数目)
 
     缺陷: 
     1. 无法删除元素，解决方案 Counting Bloom Filter
