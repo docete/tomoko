@@ -54,6 +54,11 @@ class BloomFilter():
         for probe in self.get_probes(key):
             self.bitmap[probe // 8] |= 0x1 << (probe % 8)
         self.key_count += 1
+
+    def lookup(self, key):
+        if not self.__contains__(key):
+            return "Nope"
+        return "Probably"
             
     def get_probes(self, key):
         return (self.hash_functions[i](abs(hash(key))) \
