@@ -26,7 +26,7 @@ class BloomFilterTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     suite = unittest.TestSuite()
-    suite.addTest(BloomFilterTestCase("test_probably"));
-    suite.addTest(BloomFilterTestCase("test_nope"));
+    suite.addTest(BloomFilterTestCase("test_probably"))
+    suite.addTest(BloomFilterTestCase("test_nope"))
     runner = unittest.TextTestRunner()
     runner.run(suite)
