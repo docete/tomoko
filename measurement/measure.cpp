@@ -31,7 +31,8 @@ Measurement::Measurement(int granularity, int buckets)
     totallatency(0), min(-1), max(-1),
     sum(0), count(0)
 {
-    mutex = PTHREAD_MUTEX_INITIALIZER;
+    mutex_unit = PTHREAD_MUTEX_INITIALIZER;
+    mutex_maxmin = PTHREAD_MUTEX_INITIALIZER;
     start = getTimeOfMilli();
     histogram.resize(_buckets);
 }
@@ -44,12 +45,12 @@ void Measurement::measure(int latency)
     __sync_add_and_fetch(&totallatency,latency);
     __sync_add_and_fetch(&operations, 1);
 
-    pthread_mutex_lock(mutex);
+    pthread_mutex_lock(&mutex_maxmin);
     if (latency > max)
         max = latency;
     if (latency < min || min < 0)
         min = latency;
-    pthread_mutex_unlock(mutex);
+    pthread_mutex_unlock(&mutex_maxmin);
 
     // time series:
     __sync_add_and_fetch(&count, 1);
@@ -68,7 +69,7 @@ inline void Measurement::checkEndOfUnit(bool forceend)
     long unit = ((now - start)/_granularity)*_granularity;
     //cout << "logging: " << now << "\t" << unit << endl;
 
-    pthread_mutex_lock(mutex);
+    pthread_mutex_lock(&mutex_unit);
     if ((unit > currentunit) || forceend) {
         double avg = ((double)sum) / ((double)count);
         _measurements.push_back(SeriesUnit(currentunit, avg));
@@ -78,7 +79,7 @@ inline void Measurement::checkEndOfUnit(bool forceend)
         count = 0;
         sum = 0;
     }
-    pthread_mutex_unlock(mutex);
+    pthread_mutex_unlock(&mutex_unit);
 }
 
 inline long Measurement::getTimeOfMilli()
